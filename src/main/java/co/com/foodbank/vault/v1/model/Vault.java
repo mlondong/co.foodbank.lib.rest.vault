@@ -98,10 +98,16 @@ public class Vault implements IVault {
 
     @Override
     public Collection<IContribution> getContribution() {
-        // TODO Auto-generated method stub
-        return null;
+        return contribution;
     }
 
 
+    public void addContribution(IContribution obj) {
+        this.contribution.add(obj);
+    }
+
+    public void removeContribution(IContribution obj) {
+        this.contribution.remove(obj);
+    }
 
 }

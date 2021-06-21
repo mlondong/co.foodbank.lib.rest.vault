@@ -2,18 +2,36 @@ package co.com.foodbank.vault.service;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import javax.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import co.com.foodbank.address.dto.Address;
+import co.com.foodbank.contribution.dto.ContributionData;
+import co.com.foodbank.contribution.dto.DetailContributionDTO;
+import co.com.foodbank.contribution.dto.DetailContributionData;
+import co.com.foodbank.contribution.dto.GeneralContributionDTO;
+import co.com.foodbank.contribution.dto.GeneralContributionData;
 import co.com.foodbank.contribution.dto.IContribution;
+import co.com.foodbank.contribution.sdk.exception.SDKContributionServiceException;
+import co.com.foodbank.contribution.sdk.exception.SDKContributionServiceIllegalArgumentException;
+import co.com.foodbank.contribution.sdk.exception.SDKContributionServiceNotAvailableException;
+import co.com.foodbank.contribution.sdk.service.SDKContributionService;
+import co.com.foodbank.contribution.state.Pending;
 import co.com.foodbank.country.dto.Country;
 import co.com.foodbank.vault.dto.IVault;
 import co.com.foodbank.vault.dto.VaultDTO;
+import co.com.foodbank.vault.exception.VaultNotFoundException;
 import co.com.foodbank.vault.repository.VaultRepository;
 import co.com.foodbank.vault.v1.model.Vault;
 
 @Service
+@Transactional
 public class VaultService {
 
     @Autowired
@@ -22,6 +40,12 @@ public class VaultService {
     @Autowired
     private ModelMapper modelMapper;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @Autowired
+    @Qualifier("sdkContribution")
+    private SDKContributionService sdkContribution;
 
 
     /**
@@ -30,7 +54,7 @@ public class VaultService {
      * @param dto
      * @return {@code IValut}
      */
-    public IVault create(VaultDTO dto) {
+    public IVault create(@Valid VaultDTO dto) {
         return repository.save(this.setVault(dto));
     }
 
@@ -58,5 +82,146 @@ public class VaultService {
     private Collection<IContribution> emptyContributions() {
         return new ArrayList<IContribution>();
     }
+
+
+
+    /**
+     * Method to find a Vault.
+     * 
+     * @param _id
+     * @return {@code Vault}
+     * @throws VaultNotFoundException
+     */
+    public Vault findById(String _id) throws VaultNotFoundException {
+        return repository.findById(_id)
+                .orElseThrow(() -> new VaultNotFoundException(_id));
+    }
+
+
+
+    /**
+     * Method to update a Vault.
+     * 
+     * @param _id
+     * @return {@code IVault}
+     * @throws VaultNotFoundException
+     */
+    public Vault update(VaultDTO dto, String _id) {
+        Vault vaultData = findById(_id);
+        vaultData.setAddress(modelMapper.map(dto.address, Address.class));
+        vaultData.setContact(dto.getContact());
+        vaultData.setPhones(dto.getPhones());
+        vaultData.setId(_id);
+        return repository.save(vaultData);
+    }
+
+
+
+    /**
+     * Method to add Contributions in Vault.
+     * 
+     * @param _id
+     * @param dto
+     * @return {@code IVault}
+     * @throws SDKContributionServiceIllegalArgumentException
+     * @throws SDKContributionServiceException
+     * @throws SDKContributionServiceNotAvailableException
+     * @throws JsonProcessingException
+     * @throws JsonMappingException
+     */
+    public IVault addDetailContributionInVault(String _id,
+            DetailContributionDTO dto)
+            throws JsonMappingException, JsonProcessingException,
+            SDKContributionServiceNotAvailableException,
+            SDKContributionServiceException,
+            SDKContributionServiceIllegalArgumentException {
+
+
+        // Find Vault
+        Vault vauldDb = this.findById(_id);
+
+        // Build Contribution but lost the state in deserialized
+        DetailContributionData contribution = objectMapper.readValue(
+                sdkContribution.create(dto), DetailContributionData.class);
+
+        ContributionData common =
+                modelMapper.map(contribution, ContributionData.class);
+        Pending pendingState = new Pending();
+        pendingState.pending(common);
+
+
+        DetailContributionData _final =
+                modelMapper.map(common, DetailContributionData.class);
+        _final.setId(contribution.getId());
+
+
+
+        // Again build GeneralContribution and add in Vault.
+        vauldDb.addContribution(_final);
+
+        return repository.save(vauldDb);
+
+
+    }
+
+
+
+    /**
+     * @param _id
+     * @param dto
+     * @return
+     * @throws JsonMappingException
+     * @throws JsonProcessingException
+     * @throws SDKContributionServiceNotAvailableException
+     * @throws SDKContributionServiceException
+     * @throws SDKContributionServiceIllegalArgumentException
+     */
+    public IVault addGeneralContributionInVault(String _id,
+            GeneralContributionDTO dto)
+            throws JsonMappingException, JsonProcessingException,
+            SDKContributionServiceNotAvailableException,
+            SDKContributionServiceException,
+            SDKContributionServiceIllegalArgumentException {
+
+        // Find Vault
+        Vault vauldDb = this.findById(_id);
+
+        // Build Contribution but lost the state in deserialized
+        GeneralContributionData contribution = objectMapper.readValue(
+                sdkContribution.create(dto), GeneralContributionData.class);
+
+
+        ContributionData common = keepStatePending(contribution);
+
+        GeneralContributionData _final =
+                modelMapper.map(common, GeneralContributionData.class);
+        _final.setId(contribution.getId());
+
+        // Again build GeneralContribution and add in Vault.
+        vauldDb.addContribution(_final);
+
+        return repository.save(vauldDb);
+    }
+
+
+
+    /**
+     * This method is temporal because the state is lost when try to use
+     * modelmapper because the interface is not deserialize, here we need to
+     * change dto an others things.
+     * 
+     * @param contribution
+     * @return {@code ContributionData}
+     */
+    private ContributionData keepStatePending(
+            GeneralContributionData contribution) {
+        ContributionData common =
+                modelMapper.map(contribution, ContributionData.class);
+        Pending pendingState = new Pending();
+        pendingState.pending(common);
+        return common;
+    }
+
+
 
 }
