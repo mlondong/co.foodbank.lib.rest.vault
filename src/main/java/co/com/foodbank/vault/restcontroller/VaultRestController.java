@@ -27,6 +27,13 @@ import co.com.foodbank.vault.dto.IVault;
 import co.com.foodbank.vault.dto.VaultDTO;
 import co.com.foodbank.vault.exception.VaultNotFoundException;
 import co.com.foodbank.vault.v1.controller.VaultController;
+import co.com.foodbank.vault.v1.model.Vault;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * @author mauricio.londono@gmail.com co.com.foodbank.vault.restcontroller
@@ -34,6 +41,7 @@ import co.com.foodbank.vault.v1.controller.VaultController;
  */
 @RestController
 @RequestMapping(value = "/vault")
+@Tag(name = "Vault", description = "the vault API")
 @Validated
 public class VaultRestController {
 
@@ -44,17 +52,28 @@ public class VaultRestController {
 
 
     /**
-     * method to create a Vault.
+     * Method to create a Vault.
      * 
      * @param dto
      * @return {@code ResponseEntity<IVault>}
      */
+    @Operation(summary = "Create a Vault", description = "", tags = {"vault"})
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "201",
+                            description = "Vault created",
+                            content = @Content(schema = @Schema(
+                                    implementation = Vault.class))),
+                    @ApiResponse(responseCode = "400",
+                            description = "Invalid input"),
+                    @ApiResponse(responseCode = "409",
+                            description = "Vault already exists")})
     @PostMapping(value = "/createVault",
             consumes = {MediaType.APPLICATION_JSON_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE})
     @ResponseBody
-    public ResponseEntity<IVault> createVAult(
-            @RequestBody @Valid VaultDTO dto) {
+    public ResponseEntity<IVault> createVAult(@RequestBody @Valid VaultDTO dto)
+            throws VaultNotFoundException {
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(controller.createVault(dto));
@@ -68,13 +87,25 @@ public class VaultRestController {
      * @param dto
      * @return {@code ResponseEntity<IVault>}
      */
+    @Operation(summary = "Update general information in  Vault",
+            description = "", tags = {"vault"})
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "201",
+                            description = "Vault updated",
+                            content = @Content(schema = @Schema(
+                                    implementation = Vault.class))),
+                    @ApiResponse(responseCode = "400",
+                            description = "Invalid input"),
+                    @ApiResponse(responseCode = "409",
+                            description = "Vault already exists")})
     @PutMapping(value = "/updateVault/id/{id}",
             consumes = {MediaType.APPLICATION_JSON_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE})
     @ResponseBody
     public ResponseEntity<IVault> updateVault(
             @PathVariable("id") @NotBlank @NotNull String _id,
-            @RequestBody @Valid VaultDTO dto) {
+            @RequestBody @Valid VaultDTO dto) throws VaultNotFoundException {
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(controller.updateVault(dto, _id));
@@ -83,13 +114,25 @@ public class VaultRestController {
 
 
     /**
-     * method to find Vault.
+     * Method to find Vault.
      * 
      * @param _id
      * @return {@code IVault}
      * @throws VaultNotFoundException
      */
-    @GetMapping(value = "/id/{id}")
+    @Operation(summary = "Find vault by id.")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200",
+                            description = "Vault found.",
+                            content = {
+                                    @Content(mediaType = "application/json")}),
+                    @ApiResponse(responseCode = "500",
+                            description = "Service not available.",
+                            content = @Content),
+                    @ApiResponse(responseCode = "400",
+                            description = "Bad request.", content = @Content)})
+    @GetMapping(value = "findById/id/{id}")
     public IVault findById(@PathVariable("id") @NotBlank @NotNull String _id)
             throws VaultNotFoundException {
         return controller.findById(_id);
@@ -108,6 +151,19 @@ public class VaultRestController {
      * @throws JsonProcessingException
      * @throws JsonMappingException
      */
+
+    @Operation(summary = "Add Detail-Contributions in Vault", description = "",
+            tags = {"contribution"})
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "201",
+                            description = "Vault updated",
+                            content = @Content(schema = @Schema(
+                                    implementation = Vault.class))),
+                    @ApiResponse(responseCode = "400",
+                            description = "Invalid input"),
+                    @ApiResponse(responseCode = "409",
+                            description = "Vault already exists")})
     @PutMapping(value = "/add-DetailContribution/vault-id/{id}",
             consumes = {MediaType.APPLICATION_JSON_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE})
@@ -135,6 +191,18 @@ public class VaultRestController {
      * @throws JsonProcessingException
      * @throws JsonMappingException
      */
+    @Operation(summary = "Add General-Contributions in Vault", description = "",
+            tags = {"contribution"})
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "201",
+                            description = "Vault updated",
+                            content = @Content(schema = @Schema(
+                                    implementation = Vault.class))),
+                    @ApiResponse(responseCode = "400",
+                            description = "Invalid input"),
+                    @ApiResponse(responseCode = "409",
+                            description = "Vault already exists")})
     @PutMapping(value = "/add-GeneralContribution/vault-id/{id}",
             consumes = {MediaType.APPLICATION_JSON_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE})

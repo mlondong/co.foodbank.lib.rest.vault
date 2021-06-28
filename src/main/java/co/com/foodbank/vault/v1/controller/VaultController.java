@@ -35,7 +35,8 @@ public class VaultController {
      * @param dto
      * @return {@code IVault}
      */
-    public IVault createVault(@Valid VaultDTO dto) {
+    public IVault createVault(@Valid VaultDTO dto)
+            throws VaultNotFoundException {
         return service.create(dto);
     }
 
@@ -62,7 +63,7 @@ public class VaultController {
      * @return {@code IVault}
      */
     public IVault updateVault(@Valid VaultDTO dto,
-            @NotBlank @NotNull String _id) {
+            @NotBlank @NotNull String _id) throws VaultNotFoundException {
         return service.update(dto, _id);
     }
 

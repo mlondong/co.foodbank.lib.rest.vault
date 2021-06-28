@@ -48,13 +48,16 @@ public class VaultService {
     private SDKContributionService sdkContribution;
 
 
+    private static final String MESSAGE = " id not found.";
+
+
     /**
      * Method to create an Vault.
      * 
      * @param dto
      * @return {@code IValut}
      */
-    public IVault create(@Valid VaultDTO dto) {
+    public IVault create(@Valid VaultDTO dto) throws VaultNotFoundException {
         return repository.save(this.setVault(dto));
     }
 
@@ -94,7 +97,7 @@ public class VaultService {
      */
     public Vault findById(String _id) throws VaultNotFoundException {
         return repository.findById(_id)
-                .orElseThrow(() -> new VaultNotFoundException(_id));
+                .orElseThrow(() -> new VaultNotFoundException(_id + MESSAGE));
     }
 
 
@@ -106,7 +109,9 @@ public class VaultService {
      * @return {@code IVault}
      * @throws VaultNotFoundException
      */
-    public Vault update(VaultDTO dto, String _id) {
+    public Vault update(VaultDTO dto, String _id)
+            throws VaultNotFoundException {
+
         Vault vaultData = findById(_id);
         vaultData.setAddress(modelMapper.map(dto.address, Address.class));
         vaultData.setContact(dto.getContact());
