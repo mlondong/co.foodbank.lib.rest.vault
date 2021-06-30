@@ -48,6 +48,7 @@ public class VaultService {
     private SDKContributionService sdkContribution;
 
 
+
     private static final String MESSAGE = " id not found.";
 
 
@@ -55,7 +56,9 @@ public class VaultService {
      * Method to create an Vault.
      * 
      * @param dto
+     * @param idProvider
      * @return {@code IValut}
+     * @throws VaultNotFoundException
      */
     public IVault create(@Valid VaultDTO dto) throws VaultNotFoundException {
         return repository.save(this.setVault(dto));
@@ -64,6 +67,8 @@ public class VaultService {
 
 
     /**
+     * Method to build Vault.
+     * 
      * @param dto
      * @return {@code Vault}
      */
