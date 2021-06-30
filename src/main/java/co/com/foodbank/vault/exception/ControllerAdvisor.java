@@ -13,6 +13,7 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.client.ResourceAccessException;
 import com.fasterxml.jackson.databind.exc.InvalidDefinitionException;
 import co.com.foodbank.contribution.sdk.exception.SDKContributionServiceNotAvailableException;
 
@@ -135,6 +136,23 @@ public class ControllerAdvisor {
                 apiError.getStatus());
 
     }
+
+
+    /**
+     * Method to handle ResourceAccessException.
+     */
+    @ExceptionHandler(value = ResourceAccessException.class)
+    public ResponseEntity<Object> httpResourceAccessException(
+            ResourceAccessException ex) {
+
+        ApiError apiError = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR,
+                ex.getLocalizedMessage(), ex.getMessage());
+
+        return new ResponseEntity<Object>(apiError, new HttpHeaders(),
+                apiError.getStatus());
+
+    }
+
 
 
     /*

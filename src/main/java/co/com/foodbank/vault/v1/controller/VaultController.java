@@ -12,6 +12,9 @@ import co.com.foodbank.contribution.dto.GeneralContributionDTO;
 import co.com.foodbank.contribution.sdk.exception.SDKContributionServiceException;
 import co.com.foodbank.contribution.sdk.exception.SDKContributionServiceIllegalArgumentException;
 import co.com.foodbank.contribution.sdk.exception.SDKContributionServiceNotAvailableException;
+import co.com.foodbank.user.sdk.exception.SDKUserServiceException;
+import co.com.foodbank.user.sdk.exception.SDKUserServiceIllegalArgumentException;
+import co.com.foodbank.user.sdk.exception.SDKUserServiceNotAvailableException;
 import co.com.foodbank.vault.dto.IVault;
 import co.com.foodbank.vault.dto.VaultDTO;
 import co.com.foodbank.vault.exception.VaultNotFoundException;
@@ -33,7 +36,13 @@ public class VaultController {
      * Methd to create an Vault.
      * 
      * @param dto
+     * @param idProvider
      * @return {@code IVault}
+     * @throws SDKUserServiceIllegalArgumentException
+     * @throws SDKUserServiceException
+     * @throws SDKUserServiceNotAvailableException
+     * @throws JsonProcessingException
+     * @throws JsonMappingException
      */
     public IVault createVault(@Valid VaultDTO dto)
             throws VaultNotFoundException {

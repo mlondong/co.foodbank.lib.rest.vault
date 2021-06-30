@@ -98,17 +98,24 @@
 
 		<dependency>
 			<groupId>co.com.foodbank.contribution</groupId>
-			<artifactId>co.foodbank.lib.sdk.contribution</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
-
-		<dependency>
-			<groupId>co.com.foodbank.contribution</groupId>
 			<artifactId>co.foodbank.lib.state.contribution</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 
 
+		<!-- Dependencies for  SDK-->
+		<dependency>
+			<groupId>co.com.foodbank.contribution</groupId>
+			<artifactId>co.foodbank.lib.sdk.contribution</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+
+		 <dependency>
+			<groupId>co.com.foodbank.user</groupId>
+			<artifactId>co.foodbank.lib.sdk.user</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+		
 
 	</dependencies>
 

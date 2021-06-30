@@ -23,6 +23,9 @@ import co.com.foodbank.contribution.dto.GeneralContributionDTO;
 import co.com.foodbank.contribution.sdk.exception.SDKContributionServiceException;
 import co.com.foodbank.contribution.sdk.exception.SDKContributionServiceIllegalArgumentException;
 import co.com.foodbank.contribution.sdk.exception.SDKContributionServiceNotAvailableException;
+import co.com.foodbank.user.sdk.exception.SDKUserServiceException;
+import co.com.foodbank.user.sdk.exception.SDKUserServiceIllegalArgumentException;
+import co.com.foodbank.user.sdk.exception.SDKUserServiceNotAvailableException;
 import co.com.foodbank.vault.dto.IVault;
 import co.com.foodbank.vault.dto.VaultDTO;
 import co.com.foodbank.vault.exception.VaultNotFoundException;
@@ -56,6 +59,11 @@ public class VaultRestController {
      * 
      * @param dto
      * @return {@code ResponseEntity<IVault>}
+     * @throws SDKUserServiceIllegalArgumentException
+     * @throws SDKUserServiceException
+     * @throws SDKUserServiceNotAvailableException
+     * @throws JsonProcessingException
+     * @throws JsonMappingException
      */
     @Operation(summary = "Create a Vault", description = "", tags = {"vault"})
     @ApiResponses(
@@ -74,7 +82,6 @@ public class VaultRestController {
     @ResponseBody
     public ResponseEntity<IVault> createVAult(@RequestBody @Valid VaultDTO dto)
             throws VaultNotFoundException {
-
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(controller.createVault(dto));
     }
