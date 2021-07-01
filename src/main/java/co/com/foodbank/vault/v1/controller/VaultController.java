@@ -1,5 +1,6 @@
 package co.com.foodbank.vault.v1.controller;
 
+import java.util.Collection;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -120,6 +121,42 @@ public class VaultController {
             SDKContributionServiceException,
             SDKContributionServiceIllegalArgumentException {
         return service.addGeneralContributionInVault(_id, dto);
+    }
+
+
+
+    /**
+     * Method to find all vaults
+     * 
+     * @return {@code IVaul}
+     */
+    public Collection<IVault> findAll() throws VaultNotFoundException {
+        return service.findAll();
+    }
+
+
+
+    /**
+     * Method to find vault by contact
+     * 
+     * @param contact
+     * @return {@code Collection<IVault> }
+     */
+    public Collection<IVault> findByContact(@NotNull @NotBlank String contact) {
+        return service.findByContact(contact);
+    }
+
+
+
+    /**
+     * Method to find vault by district.
+     * 
+     * @param district
+     * @return {@code Collection<IVault>}
+     */
+    public Collection<IVault> findByDistrict(@NotNull @NotBlank String district)
+            throws VaultNotFoundException {
+        return service.findByDistrict(district);
     }
 
 }
