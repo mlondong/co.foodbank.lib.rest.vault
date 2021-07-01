@@ -1,5 +1,6 @@
 package co.com.foodbank.vault.restcontroller;
 
+import java.util.Collection;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -51,6 +52,91 @@ public class VaultRestController {
 
     @Autowired
     public VaultController controller;
+
+
+
+    /**
+     * Method to find all Vault.
+     * 
+     * @param _id
+     * @return {@code ResponseEntity<Collection<IVault>>}
+     * @throws VaultNotFoundException
+     */
+    @Operation(summary = "Find all vaults.")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200",
+                            description = "Vault found.",
+                            content = {
+                                    @Content(mediaType = "application/json")}),
+                    @ApiResponse(responseCode = "500",
+                            description = "Service not available.",
+                            content = @Content),
+                    @ApiResponse(responseCode = "400",
+                            description = "Bad request.", content = @Content)})
+    @GetMapping(value = "findAll/")
+    public ResponseEntity<Collection<IVault>> findById()
+            throws VaultNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(controller.findAll());
+    }
+
+
+
+    /**
+     * Method to find by Contact.
+     * 
+     * @param _id
+     * @return {@code ResponseEntity<Collection<IVault>>}
+     * @throws VaultNotFoundException
+     */
+    @Operation(summary = "Find Vault by contact.")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200",
+                            description = "Vault found.",
+                            content = {
+                                    @Content(mediaType = "application/json")}),
+                    @ApiResponse(responseCode = "500",
+                            description = "Service not available.",
+                            content = @Content),
+                    @ApiResponse(responseCode = "400",
+                            description = "Bad request.", content = @Content)})
+    @GetMapping(value = "findContact/name/{name}")
+    public ResponseEntity<Collection<IVault>> findByContact(
+            @PathVariable("name") @NotNull @NotBlank String contact)
+            throws VaultNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(controller.findByContact(contact));
+    }
+
+
+
+    /**
+     * Method to find Vault by Dictrict.
+     * 
+     * @param _id
+     * @return {@code ResponseEntity<Collection<IVault>>}
+     * @throws VaultNotFoundException
+     */
+    @Operation(summary = "Find Vault by district.")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200",
+                            description = "Vault found.",
+                            content = {
+                                    @Content(mediaType = "application/json")}),
+                    @ApiResponse(responseCode = "500",
+                            description = "Service not available.",
+                            content = @Content),
+                    @ApiResponse(responseCode = "400",
+                            description = "Bad request.", content = @Content)})
+    @GetMapping(value = "findDistrict/{name}")
+    public ResponseEntity<Collection<IVault>> findByDistrict(
+            @PathVariable("name") @NotNull @NotBlank String district)
+            throws VaultNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(controller.findByDistrict(district));
+    }
 
 
 

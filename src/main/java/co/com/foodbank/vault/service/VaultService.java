@@ -2,6 +2,7 @@ package co.com.foodbank.vault.service;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -230,6 +231,51 @@ public class VaultService {
         Pending pendingState = new Pending();
         pendingState.pending(common);
         return common;
+    }
+
+
+
+    /**
+     * Method to find all vaults
+     * 
+     * @return {@code IVaul}
+     */
+    public Collection<IVault> findAll() throws VaultNotFoundException {
+        return repository.findAll().stream()
+                .map(d -> modelMapper.map(d, IVault.class))
+                .collect(Collectors.toList());
+    }
+
+
+    /**
+     * Method to find vault by contact
+     * 
+     * @param contact
+     * @return {@code Collection<IVault> }
+     */
+    public Collection<IVault> findByContact(String contact)
+            throws VaultNotFoundException {
+        return repository.findByContact(contact).stream()
+                .map(d -> modelMapper.map(d, IVault.class))
+                .collect(Collectors.toList());
+    }
+
+
+    /**
+     * Method to find vault by district.
+     * 
+     * @param district
+     * @return {@code Collection<IVault>}
+     */
+    public Collection<IVault> findByDistrict(String district)
+            throws VaultNotFoundException {
+
+        Collection<Vault> response = repository.findByDistrict(district);
+
+
+
+        return response.stream().map(d -> modelMapper.map(d, IVault.class))
+                .collect(Collectors.toList());
     }
 
 
