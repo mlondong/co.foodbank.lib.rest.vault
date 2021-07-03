@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import co.com.foodbank.address.dto.Address;
-import co.com.foodbank.contribution.dto.ContributionData;
 import co.com.foodbank.contribution.dto.DetailContributionDTO;
 import co.com.foodbank.contribution.dto.DetailContributionData;
 import co.com.foodbank.contribution.dto.GeneralContributionDTO;
@@ -23,7 +22,6 @@ import co.com.foodbank.contribution.sdk.exception.SDKContributionServiceIllegalA
 import co.com.foodbank.contribution.sdk.exception.SDKContributionServiceNotAvailableException;
 import co.com.foodbank.contribution.sdk.model.ResponseContributionData;
 import co.com.foodbank.contribution.sdk.service.SDKContributionService;
-import co.com.foodbank.contribution.state.Pending;
 import co.com.foodbank.country.dto.Country;
 import co.com.foodbank.vault.dto.IVault;
 import co.com.foodbank.vault.dto.VaultDTO;
@@ -183,25 +181,6 @@ public class VaultService {
         vauldDb.addContribution(result);
 
         return repository.save(vauldDb);
-    }
-
-
-
-    /**
-     * This method is temporal because the state is lost when try to use
-     * modelmapper because the interface is not deserialize, here we need to
-     * change dto an others things.
-     * 
-     * @param contribution
-     * @return {@code ContributionData}
-     */
-    private ContributionData keepStatePending(
-            ResponseContributionData contribution) {
-        ContributionData common =
-                modelMapper.map(contribution, ContributionData.class);
-        Pending pendingState = new Pending();
-        pendingState.pending(common);
-        return common;
     }
 
 
