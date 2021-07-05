@@ -13,6 +13,7 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import com.fasterxml.jackson.databind.exc.InvalidDefinitionException;
 import co.com.foodbank.contribution.sdk.exception.SDKContributionServiceNotAvailableException;
@@ -23,6 +24,21 @@ import co.com.foodbank.contribution.sdk.exception.SDKContributionServiceNotAvail
 @ControllerAdvice
 public class ControllerAdvisor {
 
+
+    /**
+     * Method to handle HttpClientErrorException.
+     */
+    @ExceptionHandler(value = HttpClientErrorException.class)
+    public ResponseEntity<Object> handleHttpClientErrorException(
+            HttpClientErrorException ex) {
+
+        ApiError apiError = new ApiError(HttpStatus.NOT_FOUND,
+                ex.getLocalizedMessage(), ex.getMessage());
+
+        return new ResponseEntity<Object>(apiError.getErrors(),
+                new HttpHeaders(), apiError.getStatus());
+
+    }
 
 
     /**
