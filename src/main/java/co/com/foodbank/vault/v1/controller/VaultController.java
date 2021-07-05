@@ -71,9 +71,17 @@ public class VaultController {
      * @param dto
      * @param _id
      * @return {@code IVault}
+     * @throws SDKUserServiceIllegalArgumentException
+     * @throws SDKUserServiceException
+     * @throws SDKUserServiceNotAvailableException
+     * @throws JsonProcessingException
+     * @throws JsonMappingException
      */
     public IVault updateVault(@Valid VaultDTO dto,
-            @NotBlank @NotNull String _id) throws VaultNotFoundException {
+            @NotBlank @NotNull String _id)
+            throws VaultNotFoundException, JsonMappingException,
+            JsonProcessingException, SDKUserServiceNotAvailableException,
+            SDKUserServiceException, SDKUserServiceIllegalArgumentException {
         return service.update(dto, _id);
     }
 

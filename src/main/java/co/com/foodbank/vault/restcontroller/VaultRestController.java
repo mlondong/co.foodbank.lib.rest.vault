@@ -179,6 +179,11 @@ public class VaultRestController {
      * 
      * @param dto
      * @return {@code ResponseEntity<IVault>}
+     * @throws SDKUserServiceIllegalArgumentException
+     * @throws SDKUserServiceException
+     * @throws SDKUserServiceNotAvailableException
+     * @throws JsonProcessingException
+     * @throws JsonMappingException
      */
     @Operation(summary = "Update general information in  Vault",
             description = "", tags = {"vault"})
@@ -198,7 +203,10 @@ public class VaultRestController {
     @ResponseBody
     public ResponseEntity<IVault> updateVault(
             @PathVariable("id") @NotBlank @NotNull String _id,
-            @RequestBody @Valid VaultDTO dto) throws VaultNotFoundException {
+            @RequestBody @Valid VaultDTO dto)
+            throws VaultNotFoundException, JsonMappingException,
+            JsonProcessingException, SDKUserServiceNotAvailableException,
+            SDKUserServiceException, SDKUserServiceIllegalArgumentException {
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(controller.updateVault(dto, _id));

@@ -23,6 +23,10 @@ import co.com.foodbank.contribution.sdk.exception.SDKContributionServiceNotAvail
 import co.com.foodbank.contribution.sdk.model.ResponseContributionData;
 import co.com.foodbank.contribution.sdk.service.SDKContributionService;
 import co.com.foodbank.country.dto.Country;
+import co.com.foodbank.user.sdk.exception.SDKUserServiceException;
+import co.com.foodbank.user.sdk.exception.SDKUserServiceIllegalArgumentException;
+import co.com.foodbank.user.sdk.exception.SDKUserServiceNotAvailableException;
+import co.com.foodbank.user.sdk.service.SDKUserService;
 import co.com.foodbank.vault.dto.IVault;
 import co.com.foodbank.vault.dto.VaultDTO;
 import co.com.foodbank.vault.exception.VaultNotFoundException;
@@ -44,7 +48,9 @@ public class VaultService {
     @Qualifier("sdkContribution")
     private SDKContributionService sdkContribution;
 
-
+    @Autowired
+    @Qualifier("sdkUser")
+    private SDKUserService sdkUser;
 
     private static final String MESSAGE = " id not found.";
 
@@ -110,16 +116,30 @@ public class VaultService {
      * @param _id
      * @return {@code IVault}
      * @throws VaultNotFoundException
+     * @throws SDKUserServiceIllegalArgumentException
+     * @throws SDKUserServiceException
+     * @throws SDKUserServiceNotAvailableException
+     * @throws JsonProcessingException
+     * @throws JsonMappingException
      */
     public Vault update(VaultDTO dto, String _id)
-            throws VaultNotFoundException {
+            throws VaultNotFoundException, JsonMappingException,
+            JsonProcessingException, SDKUserServiceNotAvailableException,
+            SDKUserServiceException, SDKUserServiceIllegalArgumentException {
 
+        /* UPDATE VAULT IN VAULT */
         Vault vaultData = findById(_id);
         vaultData.setAddress(modelMapper.map(dto.address, Address.class));
         vaultData.setContact(dto.getContact());
         vaultData.setPhones(dto.getPhones());
         vaultData.setId(_id);
-        return repository.save(vaultData);
+        Vault result = repository.save(vaultData);
+
+        /* UPDATE VAULT IN USER */
+        sdkUser.updateVaultInProvider(modelMapper.map(result, VaultDTO.class),
+                _id);
+
+        return result;
     }
 
 
