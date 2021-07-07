@@ -34,16 +34,13 @@ public class VaultController {
 
 
     /**
-     * Methd to create an Vault.
+     * Method to create an Vault.
      * 
      * @param dto
      * @param idProvider
+     * @param idProvider
      * @return {@code IVault}
-     * @throws SDKUserServiceIllegalArgumentException
-     * @throws SDKUserServiceException
-     * @throws SDKUserServiceNotAvailableException
-     * @throws JsonProcessingException
-     * @throws JsonMappingException
+     * @throws VaultNotFoundException
      */
     public IVault createVault(@Valid VaultDTO dto)
             throws VaultNotFoundException {
@@ -98,13 +95,18 @@ public class VaultController {
      * @throws SDKContributionServiceNotAvailableException
      * @throws JsonProcessingException
      * @throws JsonMappingException
+     * @throws SDKUserServiceIllegalArgumentException
+     * @throws SDKUserServiceException
+     * @throws SDKUserServiceNotAvailableException
      */
     public IVault addDetailContributionInVault(@Valid DetailContributionDTO dto,
             @NotBlank @NotNull String _id)
             throws JsonMappingException, JsonProcessingException,
             SDKContributionServiceNotAvailableException,
             SDKContributionServiceException,
-            SDKContributionServiceIllegalArgumentException {
+            SDKContributionServiceIllegalArgumentException,
+            SDKUserServiceNotAvailableException, SDKUserServiceException,
+            SDKUserServiceIllegalArgumentException {
         return service.addDetailContributionInVault(_id, dto);
     }
 
@@ -121,13 +123,18 @@ public class VaultController {
      * @throws SDKContributionServiceNotAvailableException
      * @throws SDKContributionServiceException
      * @throws SDKContributionServiceIllegalArgumentException
+     * @throws SDKUserServiceIllegalArgumentException
+     * @throws SDKUserServiceException
+     * @throws SDKUserServiceNotAvailableException
      */
     public IVault addGeneralContributionInVault(
             @Valid GeneralContributionDTO dto, @NotBlank @NotNull String _id)
             throws JsonMappingException, JsonProcessingException,
             SDKContributionServiceNotAvailableException,
             SDKContributionServiceException,
-            SDKContributionServiceIllegalArgumentException {
+            SDKContributionServiceIllegalArgumentException,
+            SDKUserServiceNotAvailableException, SDKUserServiceException,
+            SDKUserServiceIllegalArgumentException {
         return service.addGeneralContributionInVault(_id, dto);
     }
 
