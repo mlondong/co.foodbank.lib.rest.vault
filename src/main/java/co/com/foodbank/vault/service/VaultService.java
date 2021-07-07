@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import co.com.foodbank.address.dto.Address;
+import co.com.foodbank.contribution.dto.ContributionData;
 import co.com.foodbank.contribution.dto.DetailContributionDTO;
 import co.com.foodbank.contribution.dto.DetailContributionData;
 import co.com.foodbank.contribution.dto.GeneralContributionDTO;
@@ -53,6 +54,7 @@ public class VaultService {
     private SDKUserService sdkUser;
 
     private static final String MESSAGE = " id not found.";
+    private static final String PROVIDER = " Provider";
 
 
     /**
@@ -155,22 +157,42 @@ public class VaultService {
      * @throws SDKContributionServiceNotAvailableException
      * @throws JsonProcessingException
      * @throws JsonMappingException
+     * @throws SDKUserServiceIllegalArgumentException
+     * @throws SDKUserServiceException
+     * @throws SDKUserServiceNotAvailableException
      */
     public IVault addDetailContributionInVault(String _id,
             DetailContributionDTO dto)
             throws JsonMappingException, JsonProcessingException,
             SDKContributionServiceNotAvailableException,
             SDKContributionServiceException,
-            SDKContributionServiceIllegalArgumentException {
+            SDKContributionServiceIllegalArgumentException,
+            SDKUserServiceNotAvailableException, SDKUserServiceException,
+            SDKUserServiceIllegalArgumentException {
 
-        // Find Vault
-        Vault vauldDb = this.findById(_id);
-        ResponseContributionData response = sdkContribution.create(dto);
-        DetailContributionData result =
-                modelMapper.map(response, DetailContributionData.class);
-        vauldDb.addContribution(result);
+        /** FIND A VAULT IF EXIST */
+        Vault resultVault = this.findById(_id);
 
-        return repository.save(vauldDb);
+        /** CREATE A CONTRIBUTION WITH SDK CONTRIBUTION */
+        ResponseContributionData responseContribution =
+                sdkContribution.create(dto);
+
+
+        /** ADD CONTRIBUTION IN VAULT */
+        resultVault.addContribution(modelMapper.map(responseContribution,
+                DetailContributionData.class));
+
+        /** SAVE CONTRIBUTION IN VAULT */
+        Vault responseVault = repository.save(resultVault);
+
+
+        /** SAVE CONTRIBUTION IN USER VAULT */
+        sdkUser.updateContribution(
+                modelMapper.map(responseContribution, ContributionData.class),
+                _id);
+
+
+        return responseVault;
 
 
     }
@@ -178,7 +200,9 @@ public class VaultService {
 
 
     /**
-     * @param _id
+     * Method to create an contribution in vault
+     * 
+     * @param _id id del vault
      * @param dto
      * @return
      * @throws JsonMappingException
@@ -186,21 +210,39 @@ public class VaultService {
      * @throws SDKContributionServiceNotAvailableException
      * @throws SDKContributionServiceException
      * @throws SDKContributionServiceIllegalArgumentException
+     * @throws SDKUserServiceIllegalArgumentException
+     * @throws SDKUserServiceException
+     * @throws SDKUserServiceNotAvailableException
      */
     public IVault addGeneralContributionInVault(String _id,
             GeneralContributionDTO dto)
             throws JsonMappingException, JsonProcessingException,
             SDKContributionServiceNotAvailableException,
             SDKContributionServiceException,
-            SDKContributionServiceIllegalArgumentException {
+            SDKContributionServiceIllegalArgumentException,
+            SDKUserServiceNotAvailableException, SDKUserServiceException,
+            SDKUserServiceIllegalArgumentException {
 
-        Vault vauldDb = this.findById(_id);
-        ResponseContributionData response = sdkContribution.create(dto);
-        GeneralContributionData result =
-                modelMapper.map(response, GeneralContributionData.class);
-        vauldDb.addContribution(result);
+        /** FIND A VAULT IF EXIST */
+        Vault resultVault = this.findById(_id);
 
-        return repository.save(vauldDb);
+        /** CREATE A CONTRIBUTION WITH SDK CONTRIBUTION */
+        ResponseContributionData responseContribution =
+                sdkContribution.create(dto);
+
+        /** ADD CONTRIBUTION IN VAULT */
+        resultVault.addContribution(modelMapper.map(responseContribution,
+                GeneralContributionData.class));
+
+        /** SAVE CONTRIBUTION IN VAULT */
+        Vault responseVault = repository.save(resultVault);
+
+        /** SAVE CONTRIBUTION IN USER VAULT */
+        sdkUser.updateContribution(
+                modelMapper.map(responseContribution, ContributionData.class),
+                _id);
+
+        return responseVault;
     }
 
 

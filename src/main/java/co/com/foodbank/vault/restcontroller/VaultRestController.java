@@ -145,11 +145,7 @@ public class VaultRestController {
      * 
      * @param dto
      * @return {@code ResponseEntity<IVault>}
-     * @throws SDKUserServiceIllegalArgumentException
-     * @throws SDKUserServiceException
-     * @throws SDKUserServiceNotAvailableException
-     * @throws JsonProcessingException
-     * @throws JsonMappingException
+     * @throws VaultNotFoundException
      */
     @Operation(summary = "Create a Vault", description = "", tags = {"vault"})
     @ApiResponses(
@@ -251,6 +247,9 @@ public class VaultRestController {
      * @throws SDKContributionServiceNotAvailableException
      * @throws JsonProcessingException
      * @throws JsonMappingException
+     * @throws SDKUserServiceIllegalArgumentException
+     * @throws SDKUserServiceException
+     * @throws SDKUserServiceNotAvailableException
      */
 
     @Operation(summary = "Add Detail-Contributions in Vault", description = "",
@@ -265,7 +264,7 @@ public class VaultRestController {
                             description = "Invalid input"),
                     @ApiResponse(responseCode = "409",
                             description = "Vault already exists")})
-    @PutMapping(value = "/add-DetailContribution/vault-id/{id}",
+    @PostMapping(value = "/add-DetailContribution/vault-id/{id}",
             consumes = {MediaType.APPLICATION_JSON_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE})
     @ResponseBody
@@ -275,7 +274,9 @@ public class VaultRestController {
             throws JsonMappingException, JsonProcessingException,
             SDKContributionServiceNotAvailableException,
             SDKContributionServiceException,
-            SDKContributionServiceIllegalArgumentException {
+            SDKContributionServiceIllegalArgumentException,
+            SDKUserServiceNotAvailableException, SDKUserServiceException,
+            SDKUserServiceIllegalArgumentException {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(controller.addDetailContributionInVault(dto, _id));
     }
@@ -291,6 +292,9 @@ public class VaultRestController {
      * @throws SDKContributionServiceNotAvailableException
      * @throws JsonProcessingException
      * @throws JsonMappingException
+     * @throws SDKUserServiceIllegalArgumentException
+     * @throws SDKUserServiceException
+     * @throws SDKUserServiceNotAvailableException
      */
     @Operation(summary = "Add General-Contributions in Vault", description = "",
             tags = {"contribution"})
@@ -304,7 +308,7 @@ public class VaultRestController {
                             description = "Invalid input"),
                     @ApiResponse(responseCode = "409",
                             description = "Vault already exists")})
-    @PutMapping(value = "/add-GeneralContribution/vault-id/{id}",
+    @PostMapping(value = "/add-GeneralContribution/vault-id/{id}",
             consumes = {MediaType.APPLICATION_JSON_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE})
     @ResponseBody
@@ -314,8 +318,10 @@ public class VaultRestController {
             throws JsonMappingException, JsonProcessingException,
             SDKContributionServiceNotAvailableException,
             SDKContributionServiceException,
-            SDKContributionServiceIllegalArgumentException {
-        return ResponseEntity.status(HttpStatus.OK)
+            SDKContributionServiceIllegalArgumentException,
+            SDKUserServiceNotAvailableException, SDKUserServiceException,
+            SDKUserServiceIllegalArgumentException {
+        return ResponseEntity.status(HttpStatus.CREATED)
                 .body(controller.addGeneralContributionInVault(dto, _id));
     }
 
