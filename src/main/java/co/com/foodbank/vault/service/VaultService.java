@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import co.com.foodbank.address.dto.Address;
-import co.com.foodbank.contribution.dto.ContributionData;
 import co.com.foodbank.contribution.dto.DetailContributionDTO;
 import co.com.foodbank.contribution.dto.DetailContributionData;
 import co.com.foodbank.contribution.dto.GeneralContributionDTO;
@@ -23,6 +22,7 @@ import co.com.foodbank.contribution.sdk.exception.SDKContributionServiceIllegalA
 import co.com.foodbank.contribution.sdk.exception.SDKContributionServiceNotAvailableException;
 import co.com.foodbank.contribution.sdk.model.ResponseContributionData;
 import co.com.foodbank.contribution.sdk.service.SDKContributionService;
+import co.com.foodbank.contribution.state.ContributionData;
 import co.com.foodbank.country.dto.Country;
 import co.com.foodbank.user.sdk.exception.SDKUserServiceException;
 import co.com.foodbank.user.sdk.exception.SDKUserServiceIllegalArgumentException;
@@ -54,7 +54,6 @@ public class VaultService {
     private SDKUserService sdkUser;
 
     private static final String MESSAGE = " id not found.";
-    private static final String PROVIDER = " Provider";
 
 
     /**
