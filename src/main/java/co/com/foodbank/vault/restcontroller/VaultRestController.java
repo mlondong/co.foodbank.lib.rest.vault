@@ -27,8 +27,8 @@ import co.com.foodbank.contribution.sdk.exception.SDKContributionServiceNotAvail
 import co.com.foodbank.user.sdk.exception.SDKUserServiceException;
 import co.com.foodbank.user.sdk.exception.SDKUserServiceIllegalArgumentException;
 import co.com.foodbank.user.sdk.exception.SDKUserServiceNotAvailableException;
-import co.com.foodbank.vault.dto.IVault;
 import co.com.foodbank.vault.dto.VaultDTO;
+import co.com.foodbank.vault.dto.interfaces.IVault;
 import co.com.foodbank.vault.exception.VaultNotFoundException;
 import co.com.foodbank.vault.v1.controller.VaultController;
 import co.com.foodbank.vault.v1.model.Vault;
