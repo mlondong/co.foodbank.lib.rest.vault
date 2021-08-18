@@ -3,9 +3,9 @@ package co.com.foodbank.vault.v1.model;
 import java.util.Collection;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import co.com.foodbank.address.dto.IAddress;
-import co.com.foodbank.contribution.dto.IContribution;
-import co.com.foodbank.vault.dto.IVault;
+import co.com.foodbank.address.dto.interfaces.IAddress;
+import co.com.foodbank.contribution.dto.interfaces.IContribution;
+import co.com.foodbank.vault.dto.interfaces.IVault;
 
 /**
  * @author mauricio.londono@gmail.com co.com.foodbank.vault.v1.model 31/05/2021
