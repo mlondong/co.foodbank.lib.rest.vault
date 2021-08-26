@@ -188,7 +188,7 @@ public class VaultService {
         /** SAVE CONTRIBUTION IN USER VAULT */
         sdkUser.updateContribution(
                 modelMapper.map(responseContribution, ContributionData.class),
-                _id);
+                _id, responseContribution.getId());
 
 
         return responseVault;
@@ -213,7 +213,7 @@ public class VaultService {
      * @throws SDKUserServiceException
      * @throws SDKUserServiceNotAvailableException
      */
-    public IVault addGeneralContributionInVault(String _id,
+    public IVault addGeneralContributionInVault(String idVault,
             GeneralContributionDTO dto)
             throws JsonMappingException, JsonProcessingException,
             SDKContributionServiceNotAvailableException,
@@ -223,23 +223,23 @@ public class VaultService {
             SDKUserServiceIllegalArgumentException {
 
         /** FIND A VAULT IF EXIST */
-        Vault resultVault = this.findById(_id);
+        Vault vault = this.findById(idVault);
 
         /** CREATE A CONTRIBUTION WITH SDK CONTRIBUTION */
         ResponseContributionData responseContribution =
                 sdkContribution.create(dto);
 
         /** ADD CONTRIBUTION IN VAULT */
-        resultVault.addContribution(modelMapper.map(responseContribution,
+        vault.addContribution(modelMapper.map(responseContribution,
                 GeneralContributionData.class));
 
         /** SAVE CONTRIBUTION IN VAULT */
-        Vault responseVault = repository.save(resultVault);
+        Vault responseVault = repository.save(vault);
 
         /** SAVE CONTRIBUTION IN USER VAULT */
         sdkUser.updateContribution(
                 modelMapper.map(responseContribution, ContributionData.class),
-                _id);
+                idVault, responseContribution.getId());
 
         return responseVault;
     }
