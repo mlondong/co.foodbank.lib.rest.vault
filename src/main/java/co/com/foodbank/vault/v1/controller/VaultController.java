@@ -18,6 +18,7 @@ import co.com.foodbank.user.sdk.exception.SDKUserServiceIllegalArgumentException
 import co.com.foodbank.user.sdk.exception.SDKUserServiceNotAvailableException;
 import co.com.foodbank.vault.dto.VaultDTO;
 import co.com.foodbank.vault.dto.interfaces.IVault;
+import co.com.foodbank.vault.exception.VaultErrorException;
 import co.com.foodbank.vault.exception.VaultNotFoundException;
 import co.com.foodbank.vault.service.VaultService;
 
@@ -172,6 +173,70 @@ public class VaultController {
     public Collection<IVault> findByDistrict(@NotNull @NotBlank String district)
             throws VaultNotFoundException {
         return service.findByDistrict(district);
+    }
+
+
+
+    /**
+     * Method t update a Detail Contribution in the current Vault
+     * 
+     * @param dto
+     * @param idVault
+     * @param idContribution
+     * @return {@code IVault}
+     * @throws SDKContributionServiceIllegalArgumentException
+     * @throws SDKContributionServiceException
+     * @throws SDKUserServiceIllegalArgumentException
+     * @throws SDKUserServiceException
+     * @throws SDKContributionServiceNotAvailableException
+     * @throws SDKUserServiceNotAvailableException
+     * @throws JsonProcessingException
+     * @throws JsonMappingException
+     * @throws VaultErrorException
+     */
+    public IVault updateDC(@Valid DetailContributionDTO dto,
+            @NotBlank @NotNull String idVault,
+            @NotBlank @NotNull String idContribution)
+            throws JsonMappingException, JsonProcessingException,
+            SDKUserServiceNotAvailableException,
+            SDKContributionServiceNotAvailableException,
+            SDKUserServiceException, SDKUserServiceIllegalArgumentException,
+            SDKContributionServiceException,
+            SDKContributionServiceIllegalArgumentException,
+            VaultErrorException {
+
+        return service.updateDC(dto, idVault, idContribution);
+    }
+
+
+
+    /**
+     * Method to update a General Contribution.
+     * 
+     * @param dto
+     * @param idVault
+     * @param idContribution
+     * @return {@code IVault}
+     * @throws SDKContributionServiceIllegalArgumentException
+     * @throws SDKContributionServiceException
+     * @throws VaultErrorException
+     * @throws SDKUserServiceIllegalArgumentException
+     * @throws SDKUserServiceException
+     * @throws SDKContributionServiceNotAvailableException
+     * @throws SDKUserServiceNotAvailableException
+     * @throws JsonProcessingException
+     * @throws JsonMappingException
+     */
+    public IVault updateGC(@Valid GeneralContributionDTO dto,
+            @NotBlank @NotNull String idVault,
+            @NotBlank @NotNull String idContribution)
+            throws JsonMappingException, JsonProcessingException,
+            SDKUserServiceNotAvailableException,
+            SDKContributionServiceNotAvailableException,
+            SDKUserServiceException, SDKUserServiceIllegalArgumentException,
+            VaultErrorException, SDKContributionServiceException,
+            SDKContributionServiceIllegalArgumentException {
+        return service.updateGC(dto, idVault, idContribution);
     }
 
 }

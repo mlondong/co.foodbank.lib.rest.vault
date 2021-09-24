@@ -2,6 +2,7 @@ package co.com.foodbank.vault.service;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.modelmapper.ModelMapper;
@@ -23,6 +24,7 @@ import co.com.foodbank.contribution.sdk.exception.SDKContributionServiceNotAvail
 import co.com.foodbank.contribution.sdk.model.ResponseContributionData;
 import co.com.foodbank.contribution.sdk.service.SDKContributionService;
 import co.com.foodbank.contribution.state.ContributionData;
+import co.com.foodbank.contribution.state.Pending;
 import co.com.foodbank.country.dto.Country;
 import co.com.foodbank.user.sdk.exception.SDKUserServiceException;
 import co.com.foodbank.user.sdk.exception.SDKUserServiceIllegalArgumentException;
@@ -30,8 +32,10 @@ import co.com.foodbank.user.sdk.exception.SDKUserServiceNotAvailableException;
 import co.com.foodbank.user.sdk.service.SDKUserService;
 import co.com.foodbank.vault.dto.VaultDTO;
 import co.com.foodbank.vault.dto.interfaces.IVault;
+import co.com.foodbank.vault.exception.VaultErrorException;
 import co.com.foodbank.vault.exception.VaultNotFoundException;
 import co.com.foodbank.vault.repository.VaultRepository;
+import co.com.foodbank.vault.util.ParametersVault;
 import co.com.foodbank.vault.v1.model.Vault;
 
 @Service
@@ -53,7 +57,6 @@ public class VaultService {
     @Qualifier("sdkUser")
     private SDKUserService sdkUser;
 
-    private static final String MESSAGE = " id not found.";
 
 
     /**
@@ -106,7 +109,8 @@ public class VaultService {
      */
     public Vault findById(String _id) throws VaultNotFoundException {
         return repository.findById(_id)
-                .orElseThrow(() -> new VaultNotFoundException(_id + MESSAGE));
+                .orElseThrow(() -> new VaultNotFoundException(
+                        _id + ParametersVault.MESSAGE));
     }
 
 
@@ -287,6 +291,155 @@ public class VaultService {
 
         return response.stream().map(d -> modelMapper.map(d, IVault.class))
                 .collect(Collectors.toList());
+    }
+
+
+    /**
+     * Method t update a Detail Contribution in the current Vault
+     * 
+     * @param dto
+     * @param idVault
+     * @param idContribution
+     * @return {@code IVault}
+     * @throws SDKUserServiceIllegalArgumentException
+     * @throws SDKUserServiceException
+     * @throws SDKUserServiceNotAvailableException
+     * @throws JsonProcessingException
+     * @throws JsonMappingException
+     * @throws SDKContributionServiceIllegalArgumentException
+     * @throws SDKContributionServiceException
+     * @throws SDKContributionServiceNotAvailableException
+     * @throws VaultErrorException
+     */
+    public IVault updateDC(DetailContributionDTO dto, String idVault,
+            String idContribution) throws JsonMappingException,
+            JsonProcessingException, SDKUserServiceNotAvailableException,
+            SDKUserServiceException, SDKUserServiceIllegalArgumentException,
+            SDKContributionServiceNotAvailableException,
+            SDKContributionServiceException,
+            SDKContributionServiceIllegalArgumentException,
+            VaultErrorException {
+
+        /** FIND A VAULT IF EXIST */
+        Vault vault = this.findById(idVault);
+
+
+        /** CHECK IF CONTRIBUTION IS PENDING STATE */
+        IContribution found = getContributionInVault(vault, idContribution);
+        this.checkStatePending(found);
+
+
+        /** UPDATE A CONTRIBUTION WITH SDK CONTRIBUTION */
+        ResponseContributionData responseContribution =
+                sdkContribution.update(dto, idContribution);
+
+
+        /** FIND CONTRIBUTION IN VAULT AND REMOVE IT THEN ADD */
+        vault.getContribution().remove(found);
+
+        vault.getContribution().add(modelMapper.map(responseContribution,
+                DetailContributionData.class));
+
+
+        /** SAVE CONTRIBUTION IN VAULT */
+        Vault responseVault = repository.save(vault);
+
+        /** UPDATE CONTRIBUTION IN USER VAULT */
+        sdkUser.updateContribution(
+                modelMapper.map(responseContribution, ContributionData.class),
+                idVault, responseContribution.getId());
+        return responseVault;
+
+    }
+
+
+    /**
+     * Method to check the estate in contribution state pending
+     * 
+     * @param found
+     * @throws VaultErrorException
+     */
+    private void checkStatePending(IContribution found)
+            throws VaultErrorException {
+        if (!(found.getState() instanceof Pending)) {
+            throw new VaultErrorException(
+                    found.getId() + ParametersVault.MESSAGE_ERR_CONTRIB);
+        }
+
+    }
+
+
+
+    private IContribution getContributionInVault(Vault vault,
+            String idContribution) {
+
+        Optional<IContribution> found = vault.getContribution().stream()
+                .filter(d -> d.getId().equals(idContribution)).findFirst();
+
+        if (found.isEmpty()) {
+            throw new VaultNotFoundException(
+                    idContribution + ParametersVault.MESSAGE_ERR);
+        }
+
+        return found.get();
+    }
+
+
+
+    /**
+     * Method to update a General Contribution.
+     * 
+     * @param dto
+     * @param idVault
+     * @param idContribution
+     * @return {@code IVault}
+     * @throws SDKUserServiceIllegalArgumentException
+     * @throws SDKUserServiceException
+     * @throws SDKUserServiceNotAvailableException
+     * @throws JsonProcessingException
+     * @throws JsonMappingException
+     * @throws VaultErrorException
+     * @throws SDKContributionServiceIllegalArgumentException
+     * @throws SDKContributionServiceException
+     * @throws SDKContributionServiceNotAvailableException
+     */
+    public IVault updateGC(GeneralContributionDTO dto, String idVault,
+            String idContribution) throws JsonMappingException,
+            JsonProcessingException, SDKUserServiceNotAvailableException,
+            SDKUserServiceException, SDKUserServiceIllegalArgumentException,
+            VaultErrorException, SDKContributionServiceNotAvailableException,
+            SDKContributionServiceException,
+            SDKContributionServiceIllegalArgumentException {
+
+        /** FIND A VAULT IF EXIST */
+        Vault vault = this.findById(idVault);
+
+
+        /** CHECK IF CONTRIBUTION IS PENDING STATE */
+        IContribution found = getContributionInVault(vault, idContribution);
+        this.checkStatePending(found);
+
+
+        /** UPDATE A CONTRIBUTION WITH SDK CONTRIBUTION */
+        ResponseContributionData responseContribution =
+                sdkContribution.update(dto, idContribution);
+
+
+        /** FIND CONTRIBUTION IN VAULT AND REMOVE IT THEN ADD */
+        vault.getContribution().remove(found);
+
+        vault.getContribution().add(modelMapper.map(responseContribution,
+                GeneralContributionData.class));
+
+
+        /** SAVE CONTRIBUTION IN VAULT */
+        Vault responseVault = repository.save(vault);
+
+        /** UPDATE CONTRIBUTION IN USER VAULT */
+        sdkUser.updateContribution(
+                modelMapper.map(responseContribution, ContributionData.class),
+                idVault, responseContribution.getId());
+        return responseVault;
     }
 
 
