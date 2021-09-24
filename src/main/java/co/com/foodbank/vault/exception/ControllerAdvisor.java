@@ -25,6 +25,20 @@ import co.com.foodbank.contribution.sdk.exception.SDKContributionServiceNotAvail
 public class ControllerAdvisor {
 
 
+
+    /**
+     * Method to handle vault VaultErrorException.
+     */
+    @ExceptionHandler(value = VaultErrorException.class)
+    public ResponseEntity<Object> handleVaultErrorException(
+            VaultErrorException ex) {
+
+        ApiError apiError = new ApiError(HttpStatus.FORBIDDEN,
+                ex.getLocalizedMessage(), ex.getMessage());
+        return new ResponseEntity<Object>(apiError, new HttpHeaders(),
+                apiError.getStatus());
+    }
+
     /**
      * Method to handle HttpClientErrorException.
      */

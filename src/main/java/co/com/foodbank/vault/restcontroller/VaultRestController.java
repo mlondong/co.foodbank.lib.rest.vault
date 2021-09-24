@@ -30,6 +30,7 @@ import co.com.foodbank.user.sdk.exception.SDKUserServiceIllegalArgumentException
 import co.com.foodbank.user.sdk.exception.SDKUserServiceNotAvailableException;
 import co.com.foodbank.vault.dto.VaultDTO;
 import co.com.foodbank.vault.dto.interfaces.IVault;
+import co.com.foodbank.vault.exception.VaultErrorException;
 import co.com.foodbank.vault.exception.VaultNotFoundException;
 import co.com.foodbank.vault.v1.controller.VaultController;
 import co.com.foodbank.vault.v1.model.Vault;
@@ -326,6 +327,90 @@ public class VaultRestController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(controller.addGeneralContributionInVault(dto, _id));
     }
+
+
+
+    /**
+     * Method to Update a DetailContribution.
+     * 
+     * @param dto
+     * @return {@code ResponseEntity<IContribution>}
+     * @throws SDKContributionServiceIllegalArgumentException
+     * @throws SDKContributionServiceException
+     * @throws SDKUserServiceIllegalArgumentException
+     * @throws SDKUserServiceException
+     * @throws SDKContributionServiceNotAvailableException
+     * @throws SDKUserServiceNotAvailableException
+     * @throws JsonProcessingException
+     * @throws JsonMappingException
+     * @throws VaultErrorException
+     */
+
+    @Operation(summary = "Update Detail Contribution", description = "",
+            tags = {"contribution"})
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "201",
+                            description = "Vault updated",
+                            content = @Content(schema = @Schema(
+                                    implementation = Vault.class))),
+                    @ApiResponse(responseCode = "400",
+                            description = "Invalid input"),
+                    @ApiResponse(responseCode = "409",
+                            description = "Vault already exists")})
+    @PutMapping(
+            value = "/updateDetailContribution/{idContribution}/id-vault/{idVault}",
+            consumes = {MediaType.APPLICATION_JSON_VALUE},
+            produces = {MediaType.APPLICATION_JSON_VALUE})
+    @ResponseBody
+    public ResponseEntity<IVault> updateDC(
+            @RequestBody @Valid DetailContributionDTO dto,
+            @PathVariable("idContribution") @NotBlank @NotNull String idContribution,
+            @PathVariable("idVault") @NotBlank @NotNull String idVault)
+            throws JsonMappingException, JsonProcessingException,
+            SDKUserServiceNotAvailableException,
+            SDKContributionServiceNotAvailableException,
+            SDKUserServiceException, SDKUserServiceIllegalArgumentException,
+            SDKContributionServiceException,
+            SDKContributionServiceIllegalArgumentException,
+            VaultErrorException {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(controller.updateDC(dto, idVault, idContribution));
+    }
+
+
+    @Operation(summary = "Update General Contribution", description = "",
+            tags = {"contribution"})
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "201",
+                            description = "Vault updated",
+                            content = @Content(schema = @Schema(
+                                    implementation = Vault.class))),
+                    @ApiResponse(responseCode = "400",
+                            description = "Invalid input"),
+                    @ApiResponse(responseCode = "409",
+                            description = "Vault already exists")})
+    @PutMapping(
+            value = "/updateGeneralContribution/{idContribution}/id-vault/{idVault}",
+            consumes = {MediaType.APPLICATION_JSON_VALUE},
+            produces = {MediaType.APPLICATION_JSON_VALUE})
+    @ResponseBody
+    public ResponseEntity<IVault> updategC(
+            @RequestBody @Valid GeneralContributionDTO dto,
+            @PathVariable("idContribution") @NotBlank @NotNull String idContribution,
+            @PathVariable("idVault") @NotBlank @NotNull String idVault)
+            throws JsonMappingException, JsonProcessingException,
+            SDKUserServiceNotAvailableException,
+            SDKContributionServiceNotAvailableException,
+            SDKUserServiceException, SDKUserServiceIllegalArgumentException,
+            SDKContributionServiceException,
+            SDKContributionServiceIllegalArgumentException,
+            VaultErrorException {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(controller.updateGC(dto, idVault, idContribution));
+    }
+
 
 
 }
