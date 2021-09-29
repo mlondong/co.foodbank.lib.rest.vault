@@ -444,4 +444,19 @@ public class VaultService {
 
 
 
+    /**
+     * Method to find Contribution in vault
+     * 
+     * @param idContribution
+     * @return {@code IVault}
+     */
+    public Vault findContribution(String idContribution) {
+        // TODO Auto-generated method stub
+        return repository.findContribution(idContribution)
+                .orElseThrow(() -> new VaultNotFoundException(
+                        idContribution + ParametersVault.MESSAGE_VAULT));
+    }
+
+
+
 }

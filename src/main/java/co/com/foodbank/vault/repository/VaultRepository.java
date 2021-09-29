@@ -1,6 +1,7 @@
 package co.com.foodbank.vault.repository;
 
 import java.util.Collection;
+import java.util.Optional;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -20,4 +21,10 @@ public interface VaultRepository extends MongoRepository<Vault, String> {
     @Query("{'address.district':{'$regex':'?0','$options':'i'}}")
     Collection<Vault> findByDistrict(String district)
             throws VaultNotFoundException;
+
+
+    @Query(value = "{ 'contribution': { $elemMatch: { '_id' : ?0 } }}")
+    Optional<Vault> findContribution(String id) throws VaultNotFoundException;
+
+
 }

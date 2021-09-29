@@ -413,4 +413,33 @@ public class VaultRestController {
 
 
 
+    /**
+     * Method to find by Contribution.
+     * 
+     * @param idContribution
+     * @return {@code IVault}
+     * @throws VaultNotFoundException
+     */
+    @Operation(summary = "Find Contribution in Vault.")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200",
+                            description = "Contribution found.",
+                            content = {
+                                    @Content(mediaType = "application/json")}),
+                    @ApiResponse(responseCode = "500",
+                            description = "Service not available.",
+                            content = @Content),
+                    @ApiResponse(responseCode = "400",
+                            description = "Bad request.", content = @Content)})
+    @GetMapping(value = "findContribution/{id-Contribution}")
+    public ResponseEntity<IVault> findContribution(
+            @PathVariable("id-Contribution") @NotNull @NotBlank String idContribution)
+            throws VaultNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(controller.findContribution(idContribution));
+    }
+
+
+
 }

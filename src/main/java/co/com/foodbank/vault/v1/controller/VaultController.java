@@ -239,4 +239,16 @@ public class VaultController {
         return service.updateGC(dto, idVault, idContribution);
     }
 
+
+
+    /**
+     * Method to find contribution in vault.
+     * 
+     * @param idContribution
+     * @return {@code IVault}
+     */
+    public IVault findContribution(@NotNull @NotBlank String idContribution) {
+        return service.findContribution(idContribution);
+    }
+
 }
